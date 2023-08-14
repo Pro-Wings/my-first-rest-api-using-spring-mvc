@@ -2,6 +2,8 @@ package com.prowings.dao;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -55,20 +57,91 @@ public class StudentDaoImpl implements StudentDao {
 
 	@Override
 	public List<Student> getStudents() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		List<Student> stdList = null;
+		try {
+
+			tx = session.beginTransaction();
+			Query<Student> query = session.createQuery("from Student");
+			stdList = query.list();
+			tx.commit();
+
+		} catch (HibernateException ex) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			System.out.println("Exception: " + ex.getMessage());
+			ex.printStackTrace(System.err);
+		} 
+		finally 
+		{
+			session.close();
+			return stdList;
+		}
+
 	}
 
 	@Override
 	public boolean deleteStudent(int id) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		Student retrievedStd = null;
+		boolean res = false;
+		try {
+
+			tx = session.beginTransaction();
+			retrievedStd =  session.get(Student.class, id);
+			
+			if(retrievedStd != null)
+			{
+				session.delete(retrievedStd);
+				res = true;
+			}
+			tx.commit();
+
+		} catch (HibernateException ex) {
+			System.out.println("Unable to delete student : "+ ex.getMessage());
+		}
+
+		return res;
 	}
 
 	@Override
-	public boolean updateStudent(Student std) {
-		// TODO Auto-generated method stub
-		return false;
+	public Student updateStudent(Student std) {
+		
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		Student retrievedStd = null;
+		try {
+
+			tx = session.beginTransaction();
+			//get existing std
+			retrievedStd =  session.get(Student.class, std.getId());
+			
+			if(retrievedStd != null)
+			{
+				System.out.println("found existing student.. Updating it!!");
+				retrievedStd.setRoll(std.getRoll());
+				retrievedStd.setName(std.getName());
+				retrievedStd.setAddress(std.getAddress());
+				session.update(retrievedStd);
+				System.out.println("Updated successfully!!");
+			}
+			else
+			{
+				System.out.println("Since student was not present - creating it!!");
+				session.save(std);
+			}
+			tx.commit();
+
+		} catch (HibernateException ex) {
+			System.out.println("Unable to update student : "+ ex.getMessage());
+		}
+
+		return retrievedStd;
 	}
 
 }

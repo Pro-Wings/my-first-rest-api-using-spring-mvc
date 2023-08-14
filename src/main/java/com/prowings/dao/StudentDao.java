@@ -14,7 +14,7 @@ public interface StudentDao {
 	
 	public boolean deleteStudent(int id);
 
-	public boolean updateStudent(Student std);
+	public Student updateStudent(Student std);
 
 
 }

@@ -26,20 +26,17 @@ public class StudentServiceImpl implements StudentService{
 
 	@Override
 	public List<Student> getStudents() {
-		// TODO Auto-generated method stub
-		return null;
+		return studentDao.getStudents();
 	}
 
 	@Override
 	public boolean deleteStudent(int id) {
-		// TODO Auto-generated method stub
-		return false;
+		return studentDao.deleteStudent(id);
 	}
 
 	@Override
-	public boolean updateStudent(Student std) {
-		// TODO Auto-generated method stub
-		return false;
+	public Student updateStudent(Student std) {
+		return studentDao.updateStudent(std);
 	}
 
 }

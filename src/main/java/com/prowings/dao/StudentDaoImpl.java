@@ -1,5 +1,6 @@
 package com.prowings.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.prowings.entity.Student;
+import com.prowings.entity.Subject;
 
 @Repository
 public class StudentDaoImpl implements StudentDao {
@@ -142,6 +144,76 @@ public class StudentDaoImpl implements StudentDao {
 		}
 
 		return retrievedStd;
+	}
+
+	@Override
+	public List<Subject> getListOfSubjects(int id) {
+		
+		Student std = null;
+
+		Session session = sessionFactory.openSession();
+		Transaction txn = session.beginTransaction();
+
+		std = session.get(Student.class, id);
+
+		txn.commit();
+		session.close();
+
+		return std.getSubjects();
+
+	}
+
+	@Override
+	public List<Subject> getAllSubjects() {
+		
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		List<Subject> subList = null;
+		try {
+
+			tx = session.beginTransaction();
+			Query<Subject> query = session.createQuery("from Subject");
+			subList = query.list();
+			tx.commit();
+
+		} catch (HibernateException ex) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			System.out.println("Exception: " + ex.getMessage());
+			ex.printStackTrace(System.err);
+		} 
+		finally 
+		{
+			session.close();
+			return subList;
+		}
+
+	}
+
+	@Override
+	public List<Student> getStudents(Integer firstResult, Integer maxResult) {
+		List<Student> students = new ArrayList<>();
+		int paginatedCount = 0;
+        Session session = sessionFactory.openSession();
+        try {
+            Query query = session.createQuery("From Student");
+            query.setFirstResult(firstResult);
+            query.setMaxResults(maxResult);
+            students = (List) query.list();
+            if (students != null) {
+                paginatedCount = students.size();
+                System.out.println("Total Results: " + paginatedCount);
+                for (Student std : students) {
+                    System.out.println("Retrieved Students using Query : " + std);
+                }
+            }
+        } catch (HibernateException e) {
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return students;
 	}
 
 }

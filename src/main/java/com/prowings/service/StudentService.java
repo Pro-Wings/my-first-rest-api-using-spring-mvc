@@ -3,6 +3,7 @@ package com.prowings.service;
 import java.util.List;
 
 import com.prowings.entity.Student;
+import com.prowings.entity.Subject;
 
 public interface StudentService {
 
@@ -17,5 +18,11 @@ public interface StudentService {
 	public Student updateStudent(Student std);
 	
 	
+	public List<Subject> getListOfSubjects(int id);
+
+	public List<Subject> getAllSubjects();
+
+	public List<Student> getStudents(Integer firstResult, Integer maxResult);
+
 	
 }

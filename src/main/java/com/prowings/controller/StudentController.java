@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prowings.entity.Student;
 import com.prowings.entity.Subject;
 import com.prowings.service.StudentService;
@@ -24,18 +32,27 @@ import com.prowings.util.StudentNameComparator;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 
-@RestController
+@Controller
 public class StudentController {
 
 	@Autowired
 	StudentService studentService;
 
 	@PostMapping("/students")
-	public Student createStudent(@RequestBody Student std) {
+	public ResponseEntity<Student> createStudent(HttpEntity<String> httpEntity) throws JsonMappingException, JsonProcessingException {
+		
+		String requestBody = httpEntity.getBody();
+		System.out.println("Incoming Request is : "+requestBody);
+		System.out.println(httpEntity.getHeaders());
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		Student std = objectMapper.readValue(requestBody, Student.class);
+		
 		System.out.println("request received to create student  : " + std);
 
 		if (studentService.saveStudent(std))
-			return std;
+			return new ResponseEntity<Student>(std, HttpStatus.CREATED);
 		else
 			return null;
 

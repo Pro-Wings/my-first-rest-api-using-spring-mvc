@@ -21,7 +21,7 @@ public class HelloWorldController {
 	VoterService voterService;
 	
 	@GetMapping("/hello")
-	public @ResponseBody String hello()
+	public String hello()
 	{
 		return "Hello... welcome to Spring-MVC-Rest!!!";
 	}

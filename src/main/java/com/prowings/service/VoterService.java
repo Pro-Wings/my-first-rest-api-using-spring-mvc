@@ -14,8 +14,7 @@ public class VoterService {
 		String res = null;
 		if(isValidVoter(person))
 			res = person.getName() + " is valid to do the Vote!!";
-		else
-			res = "Not allowed to vote!!";
+		
 		
 		return res;
 	}
